@@ -1,0 +1,70 @@
+ --insert into Meyami15.[dbo].[dscr1]
+--Select ID,[ModelCode] from [SMS_Test].[dbo].[Model]
+truncate table  Meyami15.[dbo].[dscr1]
+--Select * from  Meyami15.[dbo].[dscr1]
+--SET IDENTITY_INSERT  Meyami15.[dbo].[dscr1] ON 
+insert into Meyami15.[dbo].[dscr1]--([dscr1_id],[dscr1_name])
+Select * from [SMS_Test].[dbo].color
+--SET IDENTITY_INSERT  Meyami15.[dbo].[dscr1] OFF
+
+Select * from  Meyami15.[dbo].[dscr1]
+
+
+
+---
+using (var reader = command.ExecuteReader())
+                        {
+ while (reader.Read())
+                            {
+                                DataRow newRow = _dataTable.NewRow();
+ DataRow newRow = _dataTable.NewRow();
+                                for (int i = 0; i < fieldCount; i++)
+                                {
+                                    try
+                                    {
+                                        var newStr = reader[i];
+                                       
+                                            var enSource = Encoding.GetEncoding(1252);
+                                            var enDest = Encoding.GetEncoding(1256); 
+                                            var srcBytes = enSource.GetBytes(reader[i].ToString());
+
+                                            newStr = enDest.GetString(srcBytes);
+                                      
+
+                                     
+
+                                       
+                                        newRow[i] = newStr ;
+
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        CSerilog.CLog(StrSQlConnection, this.GetType().Name + "|" + MethodBase.GetCurrentMethod().Name + "|SYbaseConnection[" + StrSybaseConnection + "]BranchID[" + BranchID + "]Query[" + _Query + "]", ex, "0");
+                                        throw ex;
+                                    }
+
+                                }
+                                _dataTable.Rows.Add(newRow);
+                            }
+
+
+}
+
+}
+
+
+   using (SqlBulkCopy sqlbc = new SqlBulkCopy(connection))
+                        {
+                            try
+                            {
+
+                                sqlbc.DestinationTableName = $"Color";
+                              
+                                sqlbc.WriteToServer(_dataTable.CreateDataReader());
+                            }
+                            catch (Exception ex)
+                            {
+                                CSerilog.CLog(StrSQlConnection, this.GetType().Name + "|" + MethodBase.GetCurrentMethod().Name + "|SYbaseConnection[" + StrSybaseConnection + "]BranchID[" + BranchID + "]StrQuery[" + StrQuery + "]", ex, "0");
+                                throw ex;
+                            }
+                        }
