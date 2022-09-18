@@ -1,33 +1,36 @@
+using AdoNetCore.AseClient;
 using ArmytechDbtool.Repository;
 using ArmytechDbtool.ViewModels;
 using System.Data;
 using System.Data.SqlClient;
+using System.Text;
 
 namespace ArmytechDbtool
 {
     public partial class FrmDbtool : Form
     {
-        private string CreatedConnectionString = "data source=ST-APP01;initial catalog=ERPDB;persist security info=True;user id=sa;password=sa@12345;MultipleActiveResultSets=True;";
+        private string SqlConnectionString = "data source=ST-APP01;initial catalog=ERPDB;persist security info=True;user id=sa;password=sa@12345;MultipleActiveResultSets=True;";
         TestConnectionVM createdTestConnectionVM = new TestConnectionVM();
         TestConnectionVM testConnectionVM = new TestConnectionVM();
-        List<string> AllTablesNames = new List<string>();
-        List<string> ColumnsName = new List<string>();
-        string connectionString = "";
-        string? line = @"" ;
-        string? sqlQuery ;
+        string csyBaseConnectionString = "";
+        string? ReadTextFile = @"";
+        string? CreateDatabaseQuery;
         private SqlDataReader reader = null;
-        private SqlConnection conn = null;
-        private SqlCommand cmd = null;
+       private SqlConnection sqlConnection = null;
+        IDbConnection ISqlConnection;
 
-        private void ExecuteSQLStmt(string connectionString, string sql)
+
+        private void ExecuteSQLStmt(string sqlConnectionString, string CreateDatabaseQuery)
         {
-            if (conn.State == ConnectionState.Open)
-                conn.Close();
-            CreatedConnectionString = "data source=ST-APP01;initial catalog=ERPDB;persist security info=True;user id=sa;password=sa@12345;MultipleActiveResultSets=True;";
+            
+            SqlCommand cmd = null;
+            if (sqlConnection.State == ConnectionState.Open)
+                sqlConnection.Close();
+            sqlConnectionString = "data source=ST-APP01;initial catalog=ERPDB;persist security info=True;user id=sa;password=sa@12345;MultipleActiveResultSets=True;";
 
-            conn.ConnectionString = connectionString;
-            conn.Open();
-            cmd = new SqlCommand(sql, conn);
+            sqlConnection.ConnectionString = sqlConnectionString;
+            sqlConnection.Open();
+            cmd = new SqlCommand(CreateDatabaseQuery, sqlConnection);
             try
             {
                 cmd.ExecuteNonQuery();
@@ -38,7 +41,7 @@ namespace ArmytechDbtool
             }
             finally
             {
-                conn.Close();
+                sqlConnection.Close();
             }
         }
         public FrmDbtool()
@@ -46,17 +49,19 @@ namespace ArmytechDbtool
             InitializeComponent();
         }
 
-        private void CreateDatabase(String connectionString)
+        private void CreateDatabase(String sqlConnectionString)
         {
-            sqlQuery = "CREATE DATABASE " + createdTestConnectionVM.DataBaseName + " ON PRIMARY"
+            CreateDatabaseQuery = "CREATE DATABASE " + createdTestConnectionVM.DataBaseName + " ON PRIMARY"
                + $"(Name=test_data, filename = 'C:\\Program Files\\Microsoft SQL Server\\MSSQL13.MSSQLSERVER\\MSSQL\\DATA\\{createdTestConnectionVM.DataBaseName}.mdf', size=3,"
                + "maxsize=5, filegrowth=10%)log on"
                + $"(name=mydbb_log, filename='C:\\Program Files\\Microsoft SQL Server\\MSSQL13.MSSQLSERVER\\MSSQL\\DATA\\{createdTestConnectionVM.DataBaseName}.ldf',size=3,"
                + "maxsize=20,filegrowth=1)";
             try
             {
-                ExecuteSQLStmt(connectionString, sqlQuery);
+                ExecuteSQLStmt(sqlConnectionString, CreateDatabaseQuery);
+
                 MessageBox.Show("Success");
+
             }
             catch (Exception)
             {
@@ -77,17 +82,17 @@ namespace ArmytechDbtool
 
 
 
-            string connectionString = "data source=" + createdTestConnectionVM.ServerName + ";initial catalog=ERPDB;persist security info=True;user id=" + createdTestConnectionVM.UserName + ";password=" + createdTestConnectionVM.Password + ";MultipleActiveResultSets=True;";
-            conn = new SqlConnection(CreatedConnectionString);
+            SqlConnectionString = "data source=" + createdTestConnectionVM.ServerName + ";initial catalog=ERPDB; persist security info=True;user id=" + createdTestConnectionVM.UserName + ";password=" + createdTestConnectionVM.Password + ";MultipleActiveResultSets=True;";
+            sqlConnection = new SqlConnection(SqlConnectionString);
             // Open the connection  
             try
             {
 
-                if (conn.State != ConnectionState.Open)
+                if (sqlConnection.State != ConnectionState.Open)
                 {
-                    conn.Open();
+                    sqlConnection.Open();
 
-                    StrOutConnectionString= connectionString;
+                    StrOutConnectionString = SqlConnectionString;
                 }
             }
             catch (Exception)
@@ -97,180 +102,156 @@ namespace ArmytechDbtool
             }
             finally
             {
-                if (conn.State != ConnectionState.Closed)
-                    conn.Close();   
+                if (sqlConnection.State != ConnectionState.Closed)
+                    sqlConnection.Close();
             }
-            
+
             return StrOutConnectionString;
         }
         private void BtnNext_Click(object sender, EventArgs e)
         {
-            
+
             if (TabCntrlDBTool.SelectedTab == TbPgConnections)
             {
 
                 ConnectSqlserver();
+                SqlConnectionString = "data source=" + createdTestConnectionVM.ServerName + ";initial catalog=" + createdTestConnectionVM.DataBaseName + "; persist security info=True;user id=" + createdTestConnectionVM.UserName + ";password=" + createdTestConnectionVM.Password + ";MultipleActiveResultSets=True;";
+                sqlConnection.ConnectionString = SqlConnectionString;
                 TabCntrlDBTool.SelectedTab = TbPgCreateSQlDB;
 
             }
             else if (TabCntrlDBTool.SelectedTab == TbPgCreateSQlDB)
             {
-
                 StreamReader sr = new StreamReader(DLgSelectScriptPath.FileName);
 
-                line = sr.ReadToEnd();
+                ReadTextFile = sr.ReadToEnd();
                 sr.Close();
-                if (conn.State == ConnectionState.Open)
-                    conn.Close();
-                string myConnectionString = "data source=" + createdTestConnectionVM.ServerName + ";initial catalog=" + createdTestConnectionVM.DataBaseName + "; persist security info=True;user id=" + createdTestConnectionVM.UserName + ";password=" + createdTestConnectionVM.Password + ";MultipleActiveResultSets=True;";
 
-                conn.ConnectionString = myConnectionString;
-                conn.Open();
 
-                cmd = new SqlCommand(line, conn);
+                ISqlConnection = sqlConnection;
 
-                try
+
+
+                ISqlConnection.Open();
+
+                var command = ISqlConnection.CreateCommand();
+                command.CommandText = ReadTextFile;
+                command.CommandTimeout = 0;
+
+
+                command.ExecuteNonQuery();
+
+
+
+                command.CommandText = $"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG = '{createdTestConnectionVM.DataBaseName}'";
+                command.CommandTimeout = 0;
+
+                using (var dataReader = command.ExecuteReader(CommandBehavior.Default))
                 {
-                    cmd.ExecuteNonQuery();
-                }
-                catch (SqlException ae)
-                {
-                    MessageBox.Show(ae.Message.ToString());
-                }
-                conn.Close();
-                //string connectionString = "data source=" + createdTestConnectionVM.ServerName + ";initial catalog=" + createdTestConnectionVM.DataBaseName + "; persist security info=True;user id=" + createdTestConnectionVM.UserName + ";password=" + createdTestConnectionVM.Password + ";MultipleActiveResultSets=True;";
-                using (SqlConnection con = new SqlConnection(myConnectionString))
-                {
-                    con.Open();
-
-                    SqlCommand objSqlCommand = new SqlCommand($"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG = '{createdTestConnectionVM.DataBaseName}'", con);
-                    SqlDataReader read = objSqlCommand.ExecuteReader();
-                    if (read.HasRows)
+                    while (dataReader.Read())
                     {
-                        while (read.Read())
+
+                        try
                         {
-                            checkedListBox1.Items.Add(read[0].ToString());
-                            AllTablesNames.Add(read[0].ToString());
+                            TablesCheckToTransferCKBox.Items.Add(dataReader[0].ToString());
                         }
-                    }
-                    read.Close();
-                    //con.Close();
+                        catch (Exception ex)
+                        {
 
-                }
-
-                using (SqlConnection con2 = new SqlConnection(connectionString))
-                {
-                    SqlDataReader myreader = null;
-                    if (con2.State != ConnectionState.Open)
-                    {
-                        con2.Open();
-
+                            MessageBox.Show(ex.Message);
+                        }
 
                     }
-                    string fillData = "";
-                    foreach (var item in AllTablesNames)
-                    {
-                        SqlCommand objSqlCommand = new SqlCommand($"SELECT * from {item}", con2);
-                        SqlCommand ColumnNameCommand = new SqlCommand($"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{item}'", con2);
-
-                        SqlDataReader reader = objSqlCommand.ExecuteReader();
-                         myreader = ColumnNameCommand.ExecuteReader();
-
-                       
-                        //if (reader.HasRows)
-                        //{
-                            while (reader.Read())
-                            {
-
-                                
-                                //if (myreader.HasRows)
-                                //{
-                                    while (myreader.Read())
-                                    {
-
-                                        //This Is ColumnName myreader[0].ToString();
-                                        ColumnsName.Add(myreader[0].ToString());
-                                        
-                                    }
-                                    string x = "";
-                                    string y = "";
-                                    for (int i = 0; i < ColumnsName.Count; i++)
-                                    {
-                                      
-                                        if (i != ColumnsName.Count -1)
-                                        {
-                                            x += (ColumnsName[i] + ",");
-                                            y += ("'"+reader[ColumnsName[i]] + "',");
-                                        }
-                                        else
-                                        {
-                                            x += (ColumnsName[i]);
-                                            y += ("'"+reader[ColumnsName[i]]+"'");
-                                        }
-
-                                       
-
-                                    }
-                                    fillData = $"SET IDENTITY_INSERT   {item} ON  INSERT INTO {item}({x})" + $"VALUES({y}) SET IDENTITY_INSERT  {item} OFF";
-                                x = "";
-                                y = "";
-                                    string CO = "data source=" + createdTestConnectionVM.ServerName + ";initial catalog="+ createdTestConnectionVM.DataBaseName+";persist security info=True;user id=" + createdTestConnectionVM.UserName + ";password=" + createdTestConnectionVM.Password + ";MultipleActiveResultSets=True;";
-                                    SqlCommand cm = null;
-
-                            try
-                            {
- using (SqlConnection CC = new SqlConnection(CO))
-                                    {
-                                if (CC.State != ConnectionState.Open)
-                                    CC.Open();
-                                cm = new SqlCommand(fillData, CC);
-                                        cm.ExecuteNonQuery();
-                                
-
-                                    }
-                            }
-                            catch (Exception ex)
-                            {
-
-                                MessageBox.Show(item + " :::: "+ex.Message);
-                            }
-                                   
-                                //}
-
-                                
-                            }
-                        ColumnsName.Clear();
-                        //}
 
 
-                    }
-                    //myreader.Close();
-                    //reader.Close();
 
                 }
+                ISqlConnection.Close();
 
-
-                if (TxtScriptPath.Text.Trim().Length>0)
-                {
-                    
-                       
-
-
-                    TabCntrlDBTool.SelectedTab = TbPgTransfareData;
-                }
-                
             }
 
             else
             {
-               
+                DataTable _dataTable = new DataTable();
 
+                string ConnectionStringType = "";
+                if (testConnectionVM.ServerType.Trim().ToLower() == "sqlserver")
+                {
+                    ISqlConnection = new SqlConnection(SqlConnectionString);
+                }
+                else
+                {
+                    ConnectionStringType = csyBaseConnectionString;
+                    ISqlConnection = new AseConnection(ConnectionStringType);
+                }
+
+
+                ISqlConnection.Open();
+
+
+
+                List<string> SelectedTable = new List<string>();
+                foreach (var i in TablesCheckToTransferCKBox.CheckedItems)
+                {
+                    SelectedTable.Add(i.ToString());
+
+                }
+                foreach (var item in SelectedTable)
+                {
+                    var command = ISqlConnection.CreateCommand();
+
+                    command.CommandText = $"SELECT * from {item}";
+                    command.CommandTimeout = 0;
+
+                    using (var dataReadFromSource = command.ExecuteReader(CommandBehavior.Default))
+                    {
+                       
+                        string DestConnection = "data source=" + createdTestConnectionVM.ServerName + ";initial catalog=" + createdTestConnectionVM.DataBaseName + ";persist security info=True;user id=" + createdTestConnectionVM.UserName + ";password=" + createdTestConnectionVM.Password + ";MultipleActiveResultSets=True;";
+                        try
+                        {
+
+                            using (SqlConnection DConnection = new SqlConnection(DestConnection))
+                            {
+                                if (DConnection.State != ConnectionState.Open)
+                                    DConnection.Open();
+
+                                using (SqlBulkCopy bulkCopy = new SqlBulkCopy(DConnection))
+                                {
+                                    bulkCopy.DestinationTableName = item;
+                                    bulkCopy.WriteToServer(dataReadFromSource);
+                                    //bc.DestinationTableName = item;
+
+                                    //bc.WriteToServer(_dataTable.CreateDataReader());
+                                    TableSuccedTranferdLBox.Items.Add(item);
+                                }
+
+
+
+                            }
+
+                        }
+
+                        catch (Exception ex)
+                        {
+
+                            TableHasProblemInTransferedData.Items.Add(item);
+                        }
+                    }
+                }
             }
 
-
-
+            if (TxtScriptPath.Text.Trim().Length > 0)
+            {
+                TabCntrlDBTool.SelectedTab = TbPgTransfareData;
+            }
 
         }
+
+
+
+
+
+
 
         private void LblSyBaseServerName_Click(object sender, EventArgs e)
         {
@@ -302,18 +283,12 @@ namespace ArmytechDbtool
             testConnectionVM.Password = PasswordTxt.Text;
             testConnectionVM.DataBaseName = DataBaseNameTxt.Text;
             testConnectionVM.AuthenticationType = AuthenticationcomboBox.SelectedText;
-
-
-          
-            bool result = int.TryParse(PortTxt.Text, out int portNumber);
-            //string provider = "System.Data.SqlClient";
-
-            
+            testConnectionVM.Port = PortTxt.Text;
 
             if (testConnectionVM.ServerType.Trim().ToLower() == "sqlserver")
             {
-                connectionString = "data source=" + testConnectionVM.ServerName + ";initial catalog=" + testConnectionVM.DataBaseName + ";persist security info=True;user id=" + testConnectionVM.UserName + ";password=" + testConnectionVM.Password + ";MultipleActiveResultSets=True;";
-                if (test.TestMsSQl(connectionString))
+                csyBaseConnectionString = "data source=" + testConnectionVM.ServerName + ";initial catalog=" + testConnectionVM.DataBaseName + ";persist security info=True;user id=" + testConnectionVM.UserName + ";password=" + testConnectionVM.Password + ";MultipleActiveResultSets=True;";
+                if (test.TestMsSQl(csyBaseConnectionString))
                 {
                     MessageBox.Show("Succeed");
                 }
@@ -321,12 +296,13 @@ namespace ArmytechDbtool
                 {
                     MessageBox.Show("Failed");
                 }
-                
+
             }
 
             else
             {
-                if (test.TestSybase(connectionString))
+                csyBaseConnectionString = "Data Source=" + testConnectionVM.ServerName + ";Port=" + testConnectionVM.Port + ";Database=" + testConnectionVM.DataBaseName + ";uid=" + testConnectionVM.UserName + ";pwd=" + testConnectionVM.Password + ";Connection Lifetime=1000;Charset=iso_1;";
+                if (test.TestSybase(csyBaseConnectionString))
                 {
                     MessageBox.Show("Succeed");
                 }
@@ -335,7 +311,7 @@ namespace ArmytechDbtool
                     MessageBox.Show("Failed");
                 }
             }
-            
+
         }
 
         private void label12_Click(object sender, EventArgs e)
@@ -355,14 +331,7 @@ namespace ArmytechDbtool
 
         private void FrmDbtool_Load(object sender, EventArgs e)
         {
-            //if (TabCntrlDBTool.SelectedTab == TbPgTransfareData)
-            //{
-            //    BtnNext.Enabled = false;
-            //}
-            //for (int i = 0; i < 5; i++)
-            //{
-            //    checkedListBox1.Items.Add(i);
-            //}
+           
         }
 
         private void BtnSelectScriptPath_Click(object sender, EventArgs e)
@@ -370,8 +339,6 @@ namespace ArmytechDbtool
             if (DLgSelectScriptPath.ShowDialog() == DialogResult.OK)
             {
                 TxtScriptPath.Text = DLgSelectScriptPath.FileName;
-               
-
 
             }
         }
@@ -388,7 +355,39 @@ namespace ArmytechDbtool
 
         private void BtnExit_Click(object sender, EventArgs e)
         {
-            
+
+        }
+
+        private void SelectAll_CheckedChanged(object sender, EventArgs e)
+        {
+            if (SelectAllCkBox.Checked == true)
+            {
+
+                for (int i = 0; i < TablesCheckToTransferCKBox.Items.Count; i++)
+                {
+                    TablesCheckToTransferCKBox.SetItemChecked(i, true);
+
+                }
+
+            }
+            else
+            {
+                for (int i = 0; i < TablesCheckToTransferCKBox.Items.Count; i++)
+                {
+                    TablesCheckToTransferCKBox.SetItemChecked(i, false);
+
+                }
+            }
+        }
+
+        private void AuthenticationcomboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void CreatedUserNameTxt_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

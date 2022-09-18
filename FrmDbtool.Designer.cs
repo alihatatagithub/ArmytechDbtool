@@ -55,13 +55,11 @@
             this.AuthenticationcomboBox = new System.Windows.Forms.ComboBox();
             this.DataBaseNameTxt = new System.Windows.Forms.TextBox();
             this.TblLaySQl = new System.Windows.Forms.TableLayoutPanel();
-            this.BtnCreateSQlDB = new System.Windows.Forms.Button();
             this.CreatedAuthenticationLblcombo = new System.Windows.Forms.ComboBox();
             this.CreatedServerNameTxt = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.CreatedServerTypecombo = new System.Windows.Forms.ComboBox();
             this.CreatedServerNameLbl = new System.Windows.Forms.Label();
-            this.CreatedPortTxt = new System.Windows.Forms.TextBox();
             this.label11 = new System.Windows.Forms.Label();
             this.CreatedPasswordTxt = new System.Windows.Forms.TextBox();
             this.CreatedUserNameTxt = new System.Windows.Forms.TextBox();
@@ -69,8 +67,7 @@
             this.CreatedAuthenticationLbl = new System.Windows.Forms.Label();
             this.CreatedDataBaseNameLbl = new System.Windows.Forms.Label();
             this.CreatedDataBaseNameTxt = new System.Windows.Forms.TextBox();
-            this.label12 = new System.Windows.Forms.Label();
-            this.TstConnectionBtn2 = new System.Windows.Forms.Button();
+            this.BtnCreateSQlDB = new System.Windows.Forms.Button();
             this.LblSybaseTitle = new System.Windows.Forms.Label();
             this.LblSQlTitle = new System.Windows.Forms.Label();
             this.TbPgCreateSQlDB = new System.Windows.Forms.TabPage();
@@ -79,7 +76,12 @@
             this.TxtScriptPath = new System.Windows.Forms.TextBox();
             this.LblScriptPath = new System.Windows.Forms.Label();
             this.TbPgTransfareData = new System.Windows.Forms.TabPage();
-            this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.TableHasProblemInTransferedData = new System.Windows.Forms.ListBox();
+            this.TableSuccedTranferdLBox = new System.Windows.Forms.ListBox();
+            this.SelectAllCkBox = new System.Windows.Forms.CheckBox();
+            this.TablesCheckToTransferCKBox = new System.Windows.Forms.CheckedListBox();
             this.DLgSelectScriptPath = new System.Windows.Forms.OpenFileDialog();
             this.PnlFooter.SuspendLayout();
             this.PnlContent.SuspendLayout();
@@ -307,14 +309,14 @@
             this.PasswordTxt.PasswordChar = '*';
             this.PasswordTxt.Size = new System.Drawing.Size(176, 23);
             this.PasswordTxt.TabIndex = 9;
-            this.PasswordTxt.Text = "sa@12345";
+            this.PasswordTxt.Text = "ha-P@$$-gh";
             // 
             // ServerTypecomboBox
             // 
             this.ServerTypecomboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.ServerTypecomboBox.FormattingEnabled = true;
             this.ServerTypecomboBox.Items.AddRange(new object[] {
-            "CsyBase",
+            "Sybase",
             "SqlServer"});
             this.ServerTypecomboBox.Location = new System.Drawing.Point(197, 4);
             this.ServerTypecomboBox.Name = "ServerTypecomboBox";
@@ -337,6 +339,7 @@
             this.PortTxt.Name = "PortTxt";
             this.PortTxt.Size = new System.Drawing.Size(176, 23);
             this.PortTxt.TabIndex = 11;
+            this.PortTxt.Text = "5000";
             // 
             // label5
             // 
@@ -379,6 +382,7 @@
             this.AuthenticationcomboBox.Name = "AuthenticationcomboBox";
             this.AuthenticationcomboBox.Size = new System.Drawing.Size(176, 23);
             this.AuthenticationcomboBox.TabIndex = 15;
+            this.AuthenticationcomboBox.SelectedIndexChanged += new System.EventHandler(this.AuthenticationcomboBox_SelectedIndexChanged);
             // 
             // DataBaseNameTxt
             // 
@@ -387,20 +391,18 @@
             this.DataBaseNameTxt.Name = "DataBaseNameTxt";
             this.DataBaseNameTxt.Size = new System.Drawing.Size(176, 23);
             this.DataBaseNameTxt.TabIndex = 16;
-            this.DataBaseNameTxt.Text = "Meyami";
+            this.DataBaseNameTxt.Text = "Stock200";
             // 
             // TblLaySQl
             // 
             this.TblLaySQl.ColumnCount = 2;
             this.TblLaySQl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.TblLaySQl.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.TblLaySQl.Controls.Add(this.BtnCreateSQlDB, 0, 8);
             this.TblLaySQl.Controls.Add(this.CreatedAuthenticationLblcombo, 1, 3);
             this.TblLaySQl.Controls.Add(this.CreatedServerNameTxt, 1, 1);
             this.TblLaySQl.Controls.Add(this.label7, 0, 0);
             this.TblLaySQl.Controls.Add(this.CreatedServerTypecombo, 1, 0);
             this.TblLaySQl.Controls.Add(this.CreatedServerNameLbl, 0, 1);
-            this.TblLaySQl.Controls.Add(this.CreatedPortTxt, 1, 6);
             this.TblLaySQl.Controls.Add(this.label11, 0, 5);
             this.TblLaySQl.Controls.Add(this.CreatedPasswordTxt, 1, 5);
             this.TblLaySQl.Controls.Add(this.CreatedUserNameTxt, 1, 4);
@@ -408,8 +410,7 @@
             this.TblLaySQl.Controls.Add(this.CreatedAuthenticationLbl, 0, 3);
             this.TblLaySQl.Controls.Add(this.CreatedDataBaseNameLbl, 0, 2);
             this.TblLaySQl.Controls.Add(this.CreatedDataBaseNameTxt, 1, 2);
-            this.TblLaySQl.Controls.Add(this.label12, 0, 6);
-            this.TblLaySQl.Controls.Add(this.TstConnectionBtn2, 1, 8);
+            this.TblLaySQl.Controls.Add(this.BtnCreateSQlDB, 1, 8);
             this.TblLaySQl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TblLaySQl.Location = new System.Drawing.Point(385, 41);
             this.TblLaySQl.Name = "TblLaySQl";
@@ -425,17 +426,6 @@
             this.TblLaySQl.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.TblLaySQl.Size = new System.Drawing.Size(377, 307);
             this.TblLaySQl.TabIndex = 1;
-            // 
-            // BtnCreateSQlDB
-            // 
-            this.BtnCreateSQlDB.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.BtnCreateSQlDB.Location = new System.Drawing.Point(29, 269);
-            this.BtnCreateSQlDB.Name = "BtnCreateSQlDB";
-            this.BtnCreateSQlDB.Size = new System.Drawing.Size(130, 35);
-            this.BtnCreateSQlDB.TabIndex = 20;
-            this.BtnCreateSQlDB.Text = "Create Database";
-            this.BtnCreateSQlDB.UseVisualStyleBackColor = true;
-            this.BtnCreateSQlDB.Click += new System.EventHandler(this.BtnCreateSQlDB_Click);
             // 
             // CreatedAuthenticationLblcombo
             // 
@@ -490,14 +480,6 @@
             this.CreatedServerNameLbl.Text = "Server Name:";
             this.CreatedServerNameLbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // CreatedPortTxt
-            // 
-            this.CreatedPortTxt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.CreatedPortTxt.Location = new System.Drawing.Point(191, 203);
-            this.CreatedPortTxt.Name = "CreatedPortTxt";
-            this.CreatedPortTxt.Size = new System.Drawing.Size(183, 23);
-            this.CreatedPortTxt.TabIndex = 14;
-            // 
             // label11
             // 
             this.label11.Location = new System.Drawing.Point(3, 161);
@@ -524,6 +506,8 @@
             this.CreatedUserNameTxt.Name = "CreatedUserNameTxt";
             this.CreatedUserNameTxt.Size = new System.Drawing.Size(183, 23);
             this.CreatedUserNameTxt.TabIndex = 14;
+            this.CreatedUserNameTxt.Text = "sa";
+            this.CreatedUserNameTxt.TextChanged += new System.EventHandler(this.CreatedUserNameTxt_TextChanged);
             // 
             // label10
             // 
@@ -561,27 +545,18 @@
             this.CreatedDataBaseNameTxt.Name = "CreatedDataBaseNameTxt";
             this.CreatedDataBaseNameTxt.Size = new System.Drawing.Size(183, 23);
             this.CreatedDataBaseNameTxt.TabIndex = 17;
-            this.CreatedDataBaseNameTxt.Text = "Meyami2";
+            this.CreatedDataBaseNameTxt.Text = "Stock200Tst";
             // 
-            // label12
+            // BtnCreateSQlDB
             // 
-            this.label12.Location = new System.Drawing.Point(3, 195);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(182, 31);
-            this.label12.TabIndex = 14;
-            this.label12.Text = "Port:";
-            this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.label12.Click += new System.EventHandler(this.label12_Click);
-            // 
-            // TstConnectionBtn2
-            // 
-            this.TstConnectionBtn2.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.TstConnectionBtn2.Location = new System.Drawing.Point(217, 269);
-            this.TstConnectionBtn2.Name = "TstConnectionBtn2";
-            this.TstConnectionBtn2.Size = new System.Drawing.Size(130, 35);
-            this.TstConnectionBtn2.TabIndex = 19;
-            this.TstConnectionBtn2.Text = "Test Connection";
-            this.TstConnectionBtn2.UseVisualStyleBackColor = true;
+            this.BtnCreateSQlDB.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.BtnCreateSQlDB.Location = new System.Drawing.Point(217, 269);
+            this.BtnCreateSQlDB.Name = "BtnCreateSQlDB";
+            this.BtnCreateSQlDB.Size = new System.Drawing.Size(130, 35);
+            this.BtnCreateSQlDB.TabIndex = 20;
+            this.BtnCreateSQlDB.Text = "Create Database";
+            this.BtnCreateSQlDB.UseVisualStyleBackColor = true;
+            this.BtnCreateSQlDB.Click += new System.EventHandler(this.BtnCreateSQlDB_Click);
             // 
             // LblSybaseTitle
             // 
@@ -657,7 +632,12 @@
             // 
             // TbPgTransfareData
             // 
-            this.TbPgTransfareData.Controls.Add(this.checkedListBox1);
+            this.TbPgTransfareData.Controls.Add(this.label9);
+            this.TbPgTransfareData.Controls.Add(this.label8);
+            this.TbPgTransfareData.Controls.Add(this.TableHasProblemInTransferedData);
+            this.TbPgTransfareData.Controls.Add(this.TableSuccedTranferdLBox);
+            this.TbPgTransfareData.Controls.Add(this.SelectAllCkBox);
+            this.TbPgTransfareData.Controls.Add(this.TablesCheckToTransferCKBox);
             this.TbPgTransfareData.Location = new System.Drawing.Point(4, 24);
             this.TbPgTransfareData.Name = "TbPgTransfareData";
             this.TbPgTransfareData.Size = new System.Drawing.Size(771, 357);
@@ -665,13 +645,60 @@
             this.TbPgTransfareData.Text = "Transferrer Data";
             this.TbPgTransfareData.UseVisualStyleBackColor = true;
             // 
-            // checkedListBox1
+            // label9
             // 
-            this.checkedListBox1.FormattingEnabled = true;
-            this.checkedListBox1.Location = new System.Drawing.Point(8, 3);
-            this.checkedListBox1.Name = "checkedListBox1";
-            this.checkedListBox1.Size = new System.Drawing.Size(162, 256);
-            this.checkedListBox1.TabIndex = 1;
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(404, 18);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(153, 15);
+            this.label9.TabIndex = 6;
+            this.label9.Text = "Tableshas problem Transfer";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(608, 21);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(133, 15);
+            this.label8.TabIndex = 5;
+            this.label8.Text = "Tables Transfer succeed";
+            // 
+            // TableHasProblemInTransferedData
+            // 
+            this.TableHasProblemInTransferedData.FormattingEnabled = true;
+            this.TableHasProblemInTransferedData.ItemHeight = 15;
+            this.TableHasProblemInTransferedData.Location = new System.Drawing.Point(404, 46);
+            this.TableHasProblemInTransferedData.Name = "TableHasProblemInTransferedData";
+            this.TableHasProblemInTransferedData.Size = new System.Drawing.Size(155, 289);
+            this.TableHasProblemInTransferedData.TabIndex = 4;
+            // 
+            // TableSuccedTranferdLBox
+            // 
+            this.TableSuccedTranferdLBox.FormattingEnabled = true;
+            this.TableSuccedTranferdLBox.ItemHeight = 15;
+            this.TableSuccedTranferdLBox.Location = new System.Drawing.Point(608, 46);
+            this.TableSuccedTranferdLBox.Name = "TableSuccedTranferdLBox";
+            this.TableSuccedTranferdLBox.Size = new System.Drawing.Size(155, 289);
+            this.TableSuccedTranferdLBox.TabIndex = 3;
+            // 
+            // SelectAllCkBox
+            // 
+            this.SelectAllCkBox.AutoSize = true;
+            this.SelectAllCkBox.Location = new System.Drawing.Point(8, 21);
+            this.SelectAllCkBox.Name = "SelectAllCkBox";
+            this.SelectAllCkBox.Size = new System.Drawing.Size(71, 19);
+            this.SelectAllCkBox.TabIndex = 2;
+            this.SelectAllCkBox.Text = "SelectAll";
+            this.SelectAllCkBox.UseVisualStyleBackColor = true;
+            this.SelectAllCkBox.CheckedChanged += new System.EventHandler(this.SelectAll_CheckedChanged);
+            // 
+            // TablesCheckToTransferCKBox
+            // 
+            this.TablesCheckToTransferCKBox.FormattingEnabled = true;
+            this.TablesCheckToTransferCKBox.Location = new System.Drawing.Point(8, 46);
+            this.TablesCheckToTransferCKBox.Name = "TablesCheckToTransferCKBox";
+            this.TablesCheckToTransferCKBox.Size = new System.Drawing.Size(298, 292);
+            this.TablesCheckToTransferCKBox.TabIndex = 1;
             // 
             // DLgSelectScriptPath
             // 
@@ -701,6 +728,7 @@
             this.TbPgCreateSQlDB.ResumeLayout(false);
             this.TbPgCreateSQlDB.PerformLayout();
             this.TbPgTransfareData.ResumeLayout(false);
+            this.TbPgTransfareData.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -732,8 +760,6 @@
         private Label label5;
         private ComboBox comboBox2;
         private Label label6;
-        private TextBox CreatedPortTxt;
-        private Label label12;
         private TextBox CreatedPasswordTxt;
         private Label label11;
         private TextBox CreatedUserNameTxt;
@@ -756,8 +782,13 @@
         private Button BtnSelectScriptPath;
         private TextBox TxtScriptPath;
         private Label LblScriptPath;
-        private CheckedListBox checkedListBox1;
+        private CheckedListBox TablesCheckToTransferCKBox;
         private OpenFileDialog DLgSelectScriptPath;
         private Button BtnCreateSQlDB;
+        private CheckBox SelectAllCkBox;
+        private ListBox TableSuccedTranferdLBox;
+        private Label label9;
+        private Label label8;
+        private ListBox TableHasProblemInTransferedData;
     }
 }
